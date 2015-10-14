@@ -5,7 +5,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
-import com.shawckz.xperms.Permissions;
+import com.shawckz.xperms.XPerms;
 import com.shawckz.xperms.config.AbstractSerializer;
 import com.shawckz.xperms.database.DatabaseManager;
 import com.shawckz.xperms.database.mongo.annotations.CollectionName;
@@ -16,19 +16,16 @@ import org.bson.Document;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 
 public abstract class AutoMongo {
 
-    private final Permissions instance;
+    private final XPerms instance;
 
-    public AutoMongo(Permissions instance) {
+    public AutoMongo(XPerms instance) {
         this.instance = instance;
     }
 
@@ -41,8 +38,7 @@ public abstract class AutoMongo {
 
         MongoCollection<Document> col = instance.getDatabaseManager().getDb().getCollection(tableName);
 
-        String identifier = null;
-        Object identifierValue = null;
+        Map<String, Object> identifier = new HashMap<>();
         HashMap<String, Object> values = new HashMap<>();
 
         for (Field field : this.getClass().getDeclaredFields()) {
@@ -54,20 +50,23 @@ public abstract class AutoMongo {
                     type = ClassUtils.primitiveToWrapper(type);
                 }
                 if (column.identifier()) {
-                    identifier = column.name();
-                    identifierValue = getValue(field);
+                    identifier.put(column.name(), getValue(field));
                 } else {
                     values.put(column.name(), getValue(field));
                 }
             }
         }
 
-        if (identifier == null) {
+        if (identifier.isEmpty()) {
             Bukkit.getLogger().log(Level.SEVERE, "Identifier Not Found While Using AutoMongo (" + this.getClass().getSimpleName() + ")");
             return;
         }
-        Document doc = new Document(identifier, identifierValue);
-        BasicDBObject searchQuery = new BasicDBObject().append(identifier, identifierValue);
+        Document doc = new Document();
+        BasicDBObject searchQuery = new BasicDBObject();
+        for(String key : identifier.keySet()){
+            doc.append(key, identifier.get(key));
+            searchQuery.append(key, identifier.get(key));
+        }
 
         doc.putAll(values);
 
@@ -78,7 +77,7 @@ public abstract class AutoMongo {
         }
     }
 
-    public static List<AutoMongo> select(DatabaseManager database, BasicDBObject search, Class<? extends AutoMongo> type) {
+    public static List<AutoMongo> select(XPerms plugin, BasicDBObject search, Class<? extends AutoMongo> type) {
         List<AutoMongo> vals = new ArrayList<>();
         CollectionName collectionName = type.getAnnotation(CollectionName.class);
         if (collectionName == null) {
@@ -86,7 +85,7 @@ public abstract class AutoMongo {
             return vals;
         }
 
-        MongoCollection<Document> col = database.getDb().getCollection(collectionName.name());
+        MongoCollection<Document> col = plugin.getDatabaseManager().getDb().getCollection(collectionName.name());
 
         MongoCursor<Document> cursor = col.find(search).iterator();
 
@@ -94,7 +93,7 @@ public abstract class AutoMongo {
             Document doc = cursor.next();
 
             try {
-                AutoMongo mongo = type.newInstance();
+                AutoMongo mongo = type.getConstructor(XPerms.class).newInstance(plugin);
                 for (Field field : type.getDeclaredFields()) {
                     MongoColumn mongoColumn = field.getAnnotation(MongoColumn.class);
                     if (mongoColumn != null) {
@@ -105,7 +104,7 @@ public abstract class AutoMongo {
                     }
                 }
                 vals.add(mongo);
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 e.printStackTrace();
             }
 
@@ -122,9 +121,7 @@ public abstract class AutoMongo {
 
         MongoCollection<Document> col = instance.getDatabaseManager().getDb().getCollection(tableName);
 
-        String identifier = null;
-        Object identifierValue = null;
-
+        Map<String, Object> identifier = new HashMap<>();
         for (Field field : this.getClass().getDeclaredFields()) {
             field.setAccessible(true);
             MongoColumn column = field.getAnnotation(MongoColumn.class);
@@ -134,12 +131,14 @@ public abstract class AutoMongo {
                     type = ClassUtils.primitiveToWrapper(type);
                 }
                 if (column.identifier()) {
-                    identifier = column.name();
-                    identifierValue = getValue(field);
+                    identifier.put(column.name(), getValue(field));
                 }
             }
         }
-        BasicDBObject searchQuery = new BasicDBObject().append(identifier, identifierValue);
+        BasicDBObject searchQuery = new BasicDBObject();
+        for(String key : identifier.keySet()){
+            searchQuery.put(key, identifier.get(key));
+        }
         col.deleteOne(searchQuery);
     }
 

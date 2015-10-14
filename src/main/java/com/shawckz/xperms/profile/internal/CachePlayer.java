@@ -6,18 +6,16 @@ package com.shawckz.xperms.profile.internal;
  */
 
 
-import com.shawckz.xperms.Permissions;
+import com.shawckz.xperms.XPerms;
 import com.shawckz.xperms.database.mongo.AutoMongo;
-
-import org.bukkit.permissions.Permission;
 
 /**
  * Created by Jonah on 6/11/2015.
  */
 public abstract class CachePlayer extends AutoMongo {
 
-    public CachePlayer(Permissions permissions) {
-        super(permissions);
+    public CachePlayer(XPerms instance) {
+        super(instance);
     }
 
     public abstract String getName();

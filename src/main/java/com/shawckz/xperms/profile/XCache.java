@@ -1,17 +1,16 @@
 package com.shawckz.xperms.profile;
 
-import com.shawckz.xperms.Permissions;
+import com.shawckz.xperms.XPerms;
 import com.shawckz.xperms.profile.internal.AbstractCache;
 import com.shawckz.xperms.profile.internal.CachePlayer;
 
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 public class XCache extends AbstractCache {
 
-    private final Permissions instance;
+    private final XPerms instance;
 
-    public XCache(Permissions plugin) {
+    public XCache(XPerms plugin) {
         super(plugin, XProfile.class);
         this.instance = plugin;
     }
@@ -23,6 +22,18 @@ public class XCache extends AbstractCache {
 
     @Override
     public void init(Player player, CachePlayer cachePlayer) {
-
+        if(cachePlayer instanceof XProfile){
+            XProfile profile = (XProfile) cachePlayer;
+            //todo load
+        }
     }
+
+    public XProfile getProfile(String name){
+        return (XProfile) super.getBasePlayer(name);
+    }
+
+    public XProfile getProfile(Player player){
+        return (XProfile) super.getBasePlayer(player);
+    }
+
 }

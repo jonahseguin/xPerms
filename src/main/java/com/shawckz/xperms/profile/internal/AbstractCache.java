@@ -1,14 +1,15 @@
 package com.shawckz.xperms.profile.internal;
 
 import com.mongodb.BasicDBObject;
-import com.shawckz.ipractice.database.mongo.AutoMongo;
-import com.shawckz.ipractice.database.mongo.annotations.MongoColumn;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import com.shawckz.xperms.XPerms;
+import com.shawckz.xperms.database.mongo.AutoMongo;
+import com.shawckz.xperms.database.mongo.annotations.MongoColumn;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,10 +31,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 public abstract class AbstractCache implements Listener {
 
     private final static ConcurrentMap<String, CachePlayer> players = new ConcurrentHashMap<>();
-    private final Plugin plugin;
+    private final XPerms plugin;
     private final Class<? extends CachePlayer> aClass;
 
-    public AbstractCache(Plugin plugin, Class<? extends CachePlayer> aClass){
+    public AbstractCache(XPerms plugin, Class<? extends CachePlayer> aClass){
         this.plugin = plugin;
         this.aClass = aClass;
         Bukkit.getServer().getPluginManager().registerEvents(this,plugin);
@@ -83,7 +84,7 @@ public abstract class AbstractCache implements Listener {
             }
         }
 
-        List<AutoMongo> autoMongos = CachePlayer.select(new BasicDBObject(key,name),aClass);
+        List<AutoMongo> autoMongos = CachePlayer.select(plugin, new BasicDBObject(key,name),aClass);
         for(AutoMongo mongo : autoMongos){
             if(mongo instanceof CachePlayer){
                 CachePlayer cachePlayer = (CachePlayer) mongo;

@@ -1,7 +1,7 @@
 package com.shawckz.xperms.database.mongo.serial;
 
 import com.mongodb.util.JSON;
-import com.shawckz.ipractice.configuration.AbstractSerializer;
+import com.shawckz.xperms.config.AbstractSerializer;
 
 import java.util.HashMap;
 

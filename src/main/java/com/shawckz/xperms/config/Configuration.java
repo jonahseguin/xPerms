@@ -1,13 +1,11 @@
 package com.shawckz.xperms.config;
 
-
-import com.shawckz.ipractice.configuration.annotations.ConfigData;
-import com.shawckz.ipractice.configuration.annotations.ConfigSerializer;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
+import com.shawckz.xperms.config.annotations.ConfigData;
+import com.shawckz.xperms.config.annotations.ConfigSerializer;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
