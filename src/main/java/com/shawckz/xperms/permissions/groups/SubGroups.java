@@ -80,7 +80,7 @@ public class SubGroups {
             }
         }
         //We want to set the Super Group's permissions AFTER so that it's permissions will override any duplicates in the sub groups.
-        for(Permission permission : superGroup.getPermissions().getPermissions().values()){
+        for(Permission permission : superGroup.getGroupPermissions().getPermissions().values()){
             this.allPermissions.setPermission(permission);
         }
     }

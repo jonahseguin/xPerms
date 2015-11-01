@@ -31,7 +31,7 @@ public class GroupManager {
                 loadedGroups++;
             }
         }
-        XPerms.log("Loaded "+loadedGroups+" into the cache.");
+        XPerms.log("Loaded "+loadedGroups+" groups into the cache.");
     }
 
     public void saveGroups(){
@@ -44,7 +44,7 @@ public class GroupManager {
                 savedGroups++;
             }
         }
-        XPerms.log("Saved "+savedGroups+" to the database.");
+        XPerms.log("Saved "+savedGroups+" groups to the database.");
     }
 
     public void registerGroup(PermServer permServer, Group group){
