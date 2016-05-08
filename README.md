@@ -9,8 +9,8 @@ Features include
 - Per-server groups 
 - Accessible and easy to use yet powerful commands
 - MongoDB backed
-- Easy to use API
-- 
+
+# Easy to use API
 
 Example usage: 
 
