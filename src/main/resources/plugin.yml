@@ -1,0 +1,6 @@
+name: xPerms
+main: com.shawckz.xperms.XPerms
+version: ${project.version}
+description: MongoDB backed flexible permissions plugin for Bukkit
+author: Shawckz
+website: http://shawckz.com - http://shawckz.com/project/xperms - https://github.com/Shawckz/xPerms
