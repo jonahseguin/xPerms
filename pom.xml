@@ -38,8 +38,8 @@
 
     <build>
         <defaultGoal>clean package</defaultGoal>
-        <directory>/PurePVP/build/pCore</directory>
-        <outputDirectory>/PurePVP/build/pCore/classes</outputDirectory>
+        <directory>/target</directory>
+        <outputDirectory>/target/classes</outputDirectory>
         <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
 
         <finalName>${project.artifactId}</finalName>
