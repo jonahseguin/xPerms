@@ -1,5 +1,5 @@
 package com.shawckz.xperms.commands;
 
-public class CmdListPlayerGroups {
+public class CmdListServers {
 
 }
