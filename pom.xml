@@ -38,8 +38,8 @@
 
     <build>
         <defaultGoal>clean package</defaultGoal>
-        <directory>/target</directory>
-        <outputDirectory>/target/classes</outputDirectory>
+        <directory>target</directory>
+        <outputDirectory>target/classes</outputDirectory>
         <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
 
         <finalName>${project.artifactId}</finalName>
