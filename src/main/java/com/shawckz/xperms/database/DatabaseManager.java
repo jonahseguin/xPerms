@@ -7,7 +7,11 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
 import com.shawckz.xperms.config.Configuration;
 import com.shawckz.xperms.config.annotations.ConfigData;
+import com.shawckz.xperms.exception.PermissionsException;
 import org.bukkit.plugin.Plugin;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.Arrays;
 
@@ -19,33 +23,61 @@ import java.util.Arrays;
  */
 public class DatabaseManager extends Configuration {
 
-    protected static boolean instantiated = false;
+    private static boolean instantiated = false;
     private MongoClient mongoClient;
     private MongoDatabase db;
+    private JedisPool jedisPool;
 
+    /*
+    MONGO
+     */
 
-    @ConfigData("database.name")
-    private static String databaseName = "xxx";
-    @ConfigData("database.authName")
-    private static String authDatabaseName = "xxx";
-    @ConfigData("database.host")
-    private static String host = "xxx";
-    @ConfigData("database.port")
-    private static int port = 3309;
-    @ConfigData("database.credentials.username")
-    private static String username = "xxx";
-    @ConfigData("database.credentials.password")
-    private static String password = "xxx";
-    @ConfigData("database.useAuth")
-    private boolean useAuth = false;
+    @ConfigData("database.mongo.name")
+    private static String mongoDatabaseName = "minecraft";
 
+    @ConfigData("database.mongo.auth-name")
+    private static String mongoAuthDatabaseName = "admin";
+
+    @ConfigData("database.mongo.host")
+    private static String mongoHost = "localhost";
+
+    @ConfigData("database.mongo.port")
+    private static int mongoPort = 3309;
+
+    @ConfigData("database.mongo.username")
+    private static String mongoUsername = "username";
+
+    @ConfigData("database.mongo.password")
+    private static String mongoPassword = "password";
+
+    @ConfigData("database.mongo.use-auth")
+    private boolean useMongoAuth = false;
+
+    /*
+    REDIS
+     */
+
+    @ConfigData("database.redis.use-redis")
+    private boolean useRedis = false;
+
+    @ConfigData("database.redis.host")
+    private String redisHost = "localhost";
+
+    @ConfigData("database.redis.port")
+    private int redisPort = 6379;
+
+    @ConfigData("database.redis.use-auth")
+    private boolean useRedisAuth = false;
+
+    @ConfigData("database.redis.password")
+    private String redisPassword = "password";
 
     public DatabaseManager(Plugin plugin) {
         super(plugin, "database.yml");
         if (!instantiated) {
             instantiated = true;
         } else {
-            throw new RuntimeException("DatabaseManager instance already exists");
+            throw new PermissionsException("DatabaseManager instance already exists");
         }
         load();
         save();
@@ -53,21 +85,44 @@ public class DatabaseManager extends Configuration {
     }
 
     private void setup() {
-        if (useAuth) {
-            MongoCredential credential = MongoCredential.createCredential(username, authDatabaseName, password.toCharArray());
+        if (useMongoAuth) {
+            MongoCredential credential = MongoCredential.createCredential(mongoUsername, mongoAuthDatabaseName, mongoPassword.toCharArray());
             MongoClientOptions options = MongoClientOptions.builder().connectionsPerHost(50).build();
-            mongoClient = new MongoClient(new ServerAddress(host, port), Arrays.asList(credential), options);
-            db = mongoClient.getDatabase(databaseName);
+            mongoClient = new MongoClient(new ServerAddress(mongoHost, mongoPort), Arrays.asList(credential), options);
+            db = mongoClient.getDatabase(mongoDatabaseName);
         } else {
-            mongoClient = new MongoClient(new ServerAddress(host, port));
-            db = mongoClient.getDatabase(databaseName);
+            mongoClient = new MongoClient(new ServerAddress(mongoHost, mongoPort));
+            db = mongoClient.getDatabase(mongoDatabaseName);
         }
+
+        if (useRedis) {
+            jedisPool = new JedisPool(new JedisPoolConfig(), redisHost, redisPort);
+        }
+
+    }
+
+    public Jedis getJedisResource() {
+        Jedis jedis = jedisPool.getResource();
+        if (useRedisAuth) {
+            jedis.auth(redisPassword);
+        }
+        return jedis;
+    }
+
+    public void returnJedisResource(Jedis jedis) {
+        jedis.close();
     }
 
     public void shutdown() {
         mongoClient.close();
+        jedisPool.close();
+        jedisPool = null;
         db = null;
         mongoClient = null;
+    }
+
+    public boolean isRedisEnabled() {
+        return useRedis;
     }
 
     public MongoDatabase getDb() {
