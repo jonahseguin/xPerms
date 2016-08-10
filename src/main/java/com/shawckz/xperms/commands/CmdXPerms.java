@@ -10,27 +10,28 @@ import org.bukkit.command.CommandSender;
 
 public class CmdXPerms implements GCommand {
 
-    @GCmd(name = "xperms", aliases = {"perms", "perm", "permissions", "xperm", "xpermissions"}, permission = "xperms.use")
+    @GCmd(name = "xperms", aliases = {"perms"}, permission = "xperms.use")
     public void onCommand(GCmdArgs args) {
         CommandSender sender = args.getSender().getCommandSender();
 
         msg(sender, "&7*** &9xPerms &7****");
         msg(sender, "&eDeveloped by Shawckz");
         msg(sender, "&7--> &6Commands");
+        msg(sender, "&7/xperms createserver <name>");
         msg(sender, "&7/xperms listservers");
         msg(sender, "&7/xperms listgroups");
         msg(sender, "&7/xperms showgroups <player> [server|(blank for ALL)]");
-        msg(sender, "&7/xperms addgroup <player> <server> <group>");
-        msg(sender, "&7/xperms removegroup <player> <server> <group>");
-        msg(sender, "&7/xperms addperm <group> <server> <perm>");
-        msg(sender, "&7/xperms removeperm <group> <server> <perm>");
-        msg(sender, "&7/xperms addsubgroup <group> <server> <subgroup> ");
-        msg(sender, "&7/xperms removesubgroup <group> <server> <subgroup> ");
+        msg(sender, "&7/xperms addgroup <player> <server> <groups>");
+        msg(sender, "&7/xperms removegroup <player> <server> <groups>");
+        msg(sender, "&7/xperms addperm <groups> <server> <perm>");
+        msg(sender, "&7/xperms removeperm <groups> <server> <perm>");
+        msg(sender, "&7/xperms addsubgroup <groups> <server> <subgroup> ");
+        msg(sender, "&7/xperms removesubgroup <groups> <server> <subgroup> ");
         msg(sender, "&7/xperms creategroup <name>");
         msg(sender, "&7/xperms deletegroup <name>");
-        msg(sender, "&7/xperms groupinfo <group>");
-        msg(sender, "&7/xperms setprefix <group> <prefix>");
-        msg(sender, "&7/xperms setsuffix <group> <suffix>");
+        msg(sender, "&7/xperms groupinfo <groups>");
+        msg(sender, "&7/xperms setprefix <groups> <prefix>");
+        msg(sender, "&7/xperms setsuffix <groups> <suffix>");
         msg(sender, "&7/xperms testperm <player>");
     }
 
