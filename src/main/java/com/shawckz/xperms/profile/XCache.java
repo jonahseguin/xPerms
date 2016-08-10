@@ -24,7 +24,7 @@ public class XCache extends AbstractCache {
     public void init(Player player, CachePlayer cachePlayer) {
         if (cachePlayer instanceof XProfile) {
             XProfile profile = (XProfile) cachePlayer;
-            //todo load
+            profile.refreshPermissions();
         }
     }
 
