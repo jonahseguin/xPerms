@@ -1,5 +1,6 @@
 package com.shawckz.xperms.permissions.serial;
 
+import com.shawckz.xperms.XPerms;
 import com.shawckz.xperms.config.AbstractSerializer;
 import com.shawckz.xperms.exception.PermissionsException;
 import com.shawckz.xperms.permissions.PermServer;
@@ -17,7 +18,7 @@ public class PermServerSerializer extends AbstractSerializer<PermServer> {
     @Override
     public PermServer fromString(Object data) {
         if (data instanceof String) {
-            return new PermServer(((String) data));
+            return new PermServer(XPerms.getInstance(), ((String) data));
         }
         throw new PermissionsException("Could not de-serialize PermServer (data not a String?)");
     }
