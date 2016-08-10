@@ -14,7 +14,7 @@ import lombok.Setter;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 
-@CollectionName(name = "xpermplayers")
+@CollectionName(name = "xperms_players")
 @Getter
 @Setter
 public class XProfile extends CachePlayer {
@@ -28,7 +28,7 @@ public class XProfile extends CachePlayer {
 
     @MongoColumn(name = "profileGroup")
     @DatabaseSerializer(serializer = ProfileGroupSerializer.class)
-    private ProfileGroupSet group;
+    private ProfileGroupSet groups;
 
     private final XPerms instance;
     private Player player;
@@ -38,7 +38,7 @@ public class XProfile extends CachePlayer {
         super(instance);
         this.instance = instance;
         //Keep empty constructor so that AutoMongo can instantiate
-        this.group = new ProfileGroupSet(instance);
+        this.groups = new ProfileGroupSet(instance);
     }
 
     public XProfile(XPerms instance, String uniqueId, String name) {
@@ -46,26 +46,32 @@ public class XProfile extends CachePlayer {
         this.instance = instance;
         this.uniqueId = uniqueId;
         this.name = name;
-        this.group = new ProfileGroupSet(instance);
+        this.groups = new ProfileGroupSet(instance);
     }
 
-    public void refreshPermissions(){
-        if(permissionAttachment != null){
+    /**
+     * Re-create the permissions attachment, and re-attach all permissions
+     * Should be called after applying modifying groups or permissions
+     * Loads global and then local permissions, so that local permissions
+     * override global permissions.
+     */
+    public void refreshPermissions() {
+        if (permissionAttachment != null) {
             permissionAttachment.remove();
             permissionAttachment = null;
         }
         permissionAttachment = new PermissionAttachment(instance, player);
         //Load permissions from GLOBAL
-        for(String groupName : group.getGroupSet(instance.getGlobalPermServer()).getGroups()){
+        for (String groupName : groups.getGroupSet(instance.getGlobalPermServer()).getGroups()) {
             Group g = instance.getGroupManager().getGroup(instance.getGlobalPermServer(), groupName);
-            for(Permission permission : g.getGroupPermissions().getPermissions().values()){
+            for (Permission permission : g.getGroupPermissions().getPermissions().values()) {
                 permissionAttachment.setPermission(permission.getPermission(), permission.isValue());
             }
         }
-        //Load permissions from LOCAL
-        for(String groupName : group.getGroupSet(instance.getPermServer()).getGroups()){
+        //Load permissions from LOCAL, load after loading GLOBAL so that local overrides global
+        for (String groupName : groups.getGroupSet(instance.getPermServer()).getGroups()) {
             Group g = instance.getGroupManager().getGroup(instance.getPermServer(), groupName);
-            for(Permission permission : g.getGroupPermissions().getPermissions().values()){
+            for (Permission permission : g.getGroupPermissions().getPermissions().values()) {
                 permissionAttachment.setPermission(permission.getPermission(), permission.isValue());
             }
         }

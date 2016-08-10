@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -22,43 +21,43 @@ public class SubGroups {
     private final Permissions allPermissions = new Permissions();
     private final Set<Group> subGroups = new HashSet<>();
 
-    public boolean hasSubGroup(String groupName){
+    public boolean hasSubGroup(String groupName) {
         Group group = getSubGroup(groupName);
-        if(group != null){
+        if (group != null) {
             return hasSubGroup(group);
         }
         return false;
     }
 
-    public boolean hasSubGroup(Group group){
+    public boolean hasSubGroup(Group group) {
         return subGroups.contains(group);
     }
 
-    public void addSubGroup(Group group){
+    public void addSubGroup(Group group) {
         subGroups.add(group);
         refreshPermissions();
     }
 
-    public boolean removeSubGroup(String groupName){
+    public boolean removeSubGroup(String groupName) {
         Group group = getSubGroup(groupName);
-        if(group != null){
+        if (group != null) {
             return removeSubGroup(group);
         }
         return false;
     }
 
-    public Group getSubGroup(String name){
-        for(Group group : subGroups){
-            if(group.getName().equals(name)){
+    public Group getSubGroup(String name) {
+        for (Group group : subGroups) {
+            if (group.getName().equals(name)) {
                 return group;
             }
         }
         return null;
     }
 
-    public boolean removeSubGroup(Group group){
+    public boolean removeSubGroup(Group group) {
         boolean found = subGroups.remove(group);
-        if(found){
+        if (found) {
             refreshPermissions();
         }
         return found;
@@ -68,19 +67,19 @@ public class SubGroups {
         return superGroup;
     }
 
-    public Permissions getAllPermissions(){
+    public Permissions getAllPermissions() {
         return allPermissions;
     }
 
-    private void refreshPermissions(){
+    private void refreshPermissions() {
         this.allPermissions.getPermissions().clear();
-        for(Group subGroup : subGroups){
-            for(Permission permission : subGroup.getPermissions().getPermissions().values()){
+        for (Group subGroup : subGroups) {
+            for (Permission permission : subGroup.getPermissions().getPermissions().values()) {
                 this.allPermissions.setPermission(permission);
             }
         }
         //We want to set the Super Group's permissions AFTER so that it's permissions will override any duplicates in the sub groups.
-        for(Permission permission : superGroup.getGroupPermissions().getPermissions().values()){
+        for (Permission permission : superGroup.getGroupPermissions().getPermissions().values()) {
             this.allPermissions.setPermission(permission);
         }
     }
@@ -89,10 +88,10 @@ public class SubGroups {
         return subGroups;
     }
 
-    public String[] getSubGroupsAsString(){
+    public String[] getSubGroupsAsString() {
         String[] arr = new String[subGroups.size()];
         int x = 0;
-        for(Group subGroup : subGroups){
+        for (Group subGroup : subGroups) {
             arr[x] = subGroup.getName();
             x++;
         }

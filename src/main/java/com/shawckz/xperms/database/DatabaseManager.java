@@ -7,10 +7,9 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
 import com.shawckz.xperms.config.Configuration;
 import com.shawckz.xperms.config.annotations.ConfigData;
+import org.bukkit.plugin.Plugin;
 
 import java.util.Arrays;
-
-import org.bukkit.plugin.Plugin;
 
 
 /**
@@ -54,13 +53,12 @@ public class DatabaseManager extends Configuration {
     }
 
     private void setup() {
-        if(useAuth){
+        if (useAuth) {
             MongoCredential credential = MongoCredential.createCredential(username, authDatabaseName, password.toCharArray());
             MongoClientOptions options = MongoClientOptions.builder().connectionsPerHost(50).build();
-            mongoClient = new MongoClient(new ServerAddress( host, port ), Arrays.asList(credential),options);
+            mongoClient = new MongoClient(new ServerAddress(host, port), Arrays.asList(credential), options);
             db = mongoClient.getDatabase(databaseName);
-        }
-        else{
+        } else {
             mongoClient = new MongoClient(new ServerAddress(host, port));
             db = mongoClient.getDatabase(databaseName);
         }

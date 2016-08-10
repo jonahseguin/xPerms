@@ -35,7 +35,7 @@ public class GroupSerializer extends AbstractSerializer<Group> {
 
     @Override
     public Group fromString(Object data) {
-        if(data instanceof String){
+        if (data instanceof String) {
             Document document = Document.parse(((String) data));
             final String name = document.getString("name");
             final String prefix = document.getString("prefix");
@@ -44,11 +44,11 @@ public class GroupSerializer extends AbstractSerializer<Group> {
             final String[] permissionsString = (String[]) document.get("permissions");
             final PermServer permServer = permServerSerializer.fromString(document.getString("server"));
             Permissions permissions = new Permissions();
-            for(String perm : permissionsString){
+            for (String perm : permissionsString) {
                 permissions.addPermission(perm);
             }
             SubGroups subGroups = new SubGroups(XPerms.getInstance());
-            for(String g : subGroupsString){
+            for (String g : subGroupsString) {
                 subGroups.addSubGroup(XPerms.getInstance().getGroupManager().getGroup(permServer, g));
             }
             Group group = new Group(XPerms.getInstance(), permServer, name, prefix, suffix, permissions, subGroups);

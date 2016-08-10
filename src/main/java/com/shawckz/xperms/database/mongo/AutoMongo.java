@@ -7,19 +7,17 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.shawckz.xperms.XPerms;
 import com.shawckz.xperms.config.AbstractSerializer;
-import com.shawckz.xperms.database.DatabaseManager;
 import com.shawckz.xperms.database.mongo.annotations.CollectionName;
 import com.shawckz.xperms.database.mongo.annotations.DatabaseSerializer;
 import com.shawckz.xperms.database.mongo.annotations.MongoColumn;
-import org.apache.commons.lang.ClassUtils;
+import org.apache.commons.lang3.ClassUtils;
 import org.bson.Document;
+import org.bukkit.Bukkit;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.logging.Level;
-
-import org.bukkit.Bukkit;
 
 public abstract class AutoMongo {
 
@@ -63,7 +61,7 @@ public abstract class AutoMongo {
         }
         Document doc = new Document();
         BasicDBObject searchQuery = new BasicDBObject();
-        for(String key : identifier.keySet()){
+        for (String key : identifier.keySet()) {
             doc.append(key, identifier.get(key));
             searchQuery.append(key, identifier.get(key));
         }
@@ -136,7 +134,7 @@ public abstract class AutoMongo {
             }
         }
         BasicDBObject searchQuery = new BasicDBObject();
-        for(String key : identifier.keySet()){
+        for (String key : identifier.keySet()) {
             searchQuery.put(key, identifier.get(key));
         }
         col.deleteOne(searchQuery);

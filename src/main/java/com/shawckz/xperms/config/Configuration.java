@@ -1,14 +1,14 @@
 package com.shawckz.xperms.config;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Field;
-
 import com.shawckz.xperms.config.annotations.ConfigData;
 import com.shawckz.xperms.config.annotations.ConfigSerializer;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Field;
 
 
 public class Configuration {
@@ -51,9 +51,9 @@ public class Configuration {
         }
     }
 
-    public void deleteFile(){
-        if(directory.exists()){
-            if(file.exists()){
+    public void deleteFile() {
+        if (directory.exists()) {
+            if (file.exists()) {
                 file.delete();
             }
         }

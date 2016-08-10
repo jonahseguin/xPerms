@@ -4,14 +4,6 @@
 
 package com.shawckz.xperms.command;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandMap;
@@ -20,6 +12,14 @@ import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.SimplePluginManager;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Jonah Seguin on 12/13/2015.
@@ -41,8 +41,7 @@ public class GCommandHandler {
                 Field field = SimplePluginManager.class.getDeclaredField("commandMap");
                 field.setAccessible(true);
                 map = (CommandMap) field.get(manager);
-            }
-            catch (IllegalArgumentException | SecurityException | IllegalAccessException | NoSuchFieldException e) {
+            } catch (IllegalArgumentException | SecurityException | IllegalAccessException | NoSuchFieldException e) {
                 e.printStackTrace();
             }
         }
@@ -58,8 +57,7 @@ public class GCommandHandler {
                 }
                 if (commands == null || commands.length == 0) {
                     registerCommand(command, method, data);
-                }
-                else if (commands.length > 0) {
+                } else if (commands.length > 0) {
                     for (String s : commands) {
                         if (data.name().equalsIgnoreCase(s)) {
                             registerCommand(command, method, data);
@@ -76,8 +74,7 @@ public class GCommandHandler {
             public void call(GCmdArgs args) {
                 try {
                     method.invoke(command, args);
-                }
-                catch (IllegalAccessException | InvocationTargetException ex) {
+                } catch (IllegalAccessException | InvocationTargetException ex) {
                     throw new GCommandException("Could not register command caller", ex);
                 }
             }
@@ -90,7 +87,7 @@ public class GCommandHandler {
         String bukkitCommandName = commandName.replace(" ", "$split").split("$split")[0].toLowerCase();
         if (map.getCommand(bukkitCommandName) == null) {
             List<String> alList = new ArrayList<>();
-            for(String s : wrapper.getAliases()) {
+            for (String s : wrapper.getAliases()) {
                 String alias = s.replace(" ", "$split").split("$split")[0].toLowerCase();
                 alList.add(alias);
             }
@@ -134,7 +131,7 @@ public class GCommandHandler {
             if (commandMap.containsKey(cmdLabel)) {
                 GCmdWrapper wrapper = commandMap.get(cmdLabel);
 
-                if(wrapper.isPlayerOnly() && (!(sender instanceof Player))) {
+                if (wrapper.isPlayerOnly() && (!(sender instanceof Player))) {
                     sender.sendMessage(ChatColor.RED + "This is a player only command.");
                     return;
                 }
@@ -153,8 +150,7 @@ public class GCommandHandler {
                 if (wrapper.getMinArgs() > newArgs.length) {
                     if (wrapper.getUsage().equals("")) {
                         sender.sendMessage(ChatColor.RED + "Invalid Usage.  Required arguments: " + wrapper.getMinArgs());
-                    }
-                    else {
+                    } else {
                         sender.sendMessage(ChatColor.RED + "Usage: " + wrapper.getUsage());
                     }
                     return;

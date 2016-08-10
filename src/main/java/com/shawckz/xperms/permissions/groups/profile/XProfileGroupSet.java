@@ -30,20 +30,24 @@ public class XProfileGroupSet {
         this.groups = groups;
     }
 
-    public boolean hasGroup(String groupName){
+    public boolean hasGroup(Group group) {
+        return hasGroup(group.getName());
+    }
+
+    public boolean hasGroup(String groupName) {
         return groups.contains(groupName);
     }
 
-    public void saveGroup(Group group){
+    public void saveGroup(Group group) {
         groups.add(group.getName());
     }
 
-    public void removeGroup(Group group){
+    public void removeGroup(Group group) {
         groups.remove(group.getName());
     }
 
-    public Group getGroup(String groupName){
-        if(groups.contains(groupName)){
+    public Group getGroup(String groupName) {
+        if (groups.contains(groupName)) {
             return instance.getGroupManager().getGroup(permServer, groupName);
         }
         return null;

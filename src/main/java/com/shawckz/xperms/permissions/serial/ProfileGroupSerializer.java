@@ -21,8 +21,8 @@ public class ProfileGroupSerializer extends AbstractSerializer<ProfileGroupSet> 
 
     @Override
     public String toString(ProfileGroupSet data) {
-        Map<String,String> result = new HashMap<>();
-        for(PermServer server : data.getGroups().keySet()){
+        Map<String, String> result = new HashMap<>();
+        for (PermServer server : data.getGroups().keySet()) {
             String key = permServerSerializer.toString(server);
             XProfileGroupSet xProfileGroupSet = data.getGroupSet(server);
             String value = JSON.serialize(xProfileGroupSet.getGroups());
@@ -33,11 +33,11 @@ public class ProfileGroupSerializer extends AbstractSerializer<ProfileGroupSet> 
 
     @Override
     public ProfileGroupSet fromString(Object data) {
-        if(data instanceof String){
-            Object parse = JSON.parse(((String)data));
-            Map<String,String> val = (Map<String,String>) parse;
-            Map<PermServer,XProfileGroupSet> result = new HashMap<>();
-            for(String key : val.keySet()){
+        if (data instanceof String) {
+            Object parse = JSON.parse(((String) data));
+            Map<String, String> val = (Map<String, String>) parse;
+            Map<PermServer, XProfileGroupSet> result = new HashMap<>();
+            for (String key : val.keySet()) {
                 PermServer server = permServerSerializer.fromString(key);
                 Set<String> groups = (Set<String>) JSON.parse(val.get(key));
                 XProfileGroupSet xProfileGroupSet = new XProfileGroupSet(XPerms.getInstance(), server, groups);

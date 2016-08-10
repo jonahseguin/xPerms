@@ -15,20 +15,20 @@ public class XGroupSet {
     private final PermServer server;
     private final Map<String, Group> groups = new HashMap<>();
 
-    public boolean hasGroup(String groupName){
+    public boolean hasGroup(String groupName) {
         return groups.containsKey(groupName);
     }
 
-    public void saveGroup(Group group){
+    public void saveGroup(Group group) {
         groups.put(group.getName(), group);
     }
 
-    public void removeGroup(Group group){
+    public void removeGroup(Group group) {
         groups.remove(group.getName());
     }
 
-    public Group getGroup(String groupName){
-        if(hasGroup(groupName)){
+    public Group getGroup(String groupName) {
+        if (hasGroup(groupName)) {
             return groups.get(groupName);
         }
         return null;

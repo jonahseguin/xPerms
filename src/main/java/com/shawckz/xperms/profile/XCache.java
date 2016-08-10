@@ -3,7 +3,7 @@ package com.shawckz.xperms.profile;
 import com.shawckz.xperms.XPerms;
 import com.shawckz.xperms.profile.internal.AbstractCache;
 import com.shawckz.xperms.profile.internal.CachePlayer;
-
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class XCache extends AbstractCache {
@@ -22,17 +22,25 @@ public class XCache extends AbstractCache {
 
     @Override
     public void init(Player player, CachePlayer cachePlayer) {
-        if(cachePlayer instanceof XProfile){
+        if (cachePlayer instanceof XProfile) {
             XProfile profile = (XProfile) cachePlayer;
             //todo load
         }
     }
 
-    public XProfile getProfile(String name){
+    public XProfile lookupProfile(String name) {
+        Player targetPlayer = Bukkit.getPlayer(name);
+        if (targetPlayer != null) {
+            name = targetPlayer.getName();
+        }
+        return getProfile(name);
+    }
+
+    public XProfile getProfile(String name) {
         return (XProfile) super.getBasePlayer(name);
     }
 
-    public XProfile getProfile(Player player){
+    public XProfile getProfile(Player player) {
         return (XProfile) super.getBasePlayer(player);
     }
 

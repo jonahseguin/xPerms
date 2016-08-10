@@ -17,7 +17,7 @@ import lombok.Setter;
 @CollectionName(name = "xpermgroups")
 @Getter
 @Setter
-public class DatabaseGroupContainer extends AutoMongo{
+public class DatabaseGroupContainer extends AutoMongo {
 
     @MongoColumn(name = "groupName", identifier = true)
     private String groupName;
@@ -26,7 +26,7 @@ public class DatabaseGroupContainer extends AutoMongo{
     @DatabaseSerializer(serializer = PermServerSerializer.class)
     private PermServer permServer;
 
-    @MongoColumn(name = "group")
+    @MongoColumn(name = "groups")
     @DatabaseSerializer(serializer = GroupSerializer.class)
     private Group group;
 
@@ -34,7 +34,7 @@ public class DatabaseGroupContainer extends AutoMongo{
         super(instance);
     }
 
-    public DatabaseGroupContainer(XPerms instance, PermServer permServer, Group group){
+    public DatabaseGroupContainer(XPerms instance, PermServer permServer, Group group) {
         super(instance);
         this.permServer = permServer;
         this.groupName = group.getName();

@@ -10,19 +10,19 @@ import lombok.NonNull;
 public class Permission {
 
     private final String permission;
-    @NonNull private boolean value;
+    @NonNull
+    private boolean value;
 
     @Override
-    public String toString(){
+    public String toString() {
         return (!value ? "-" : "") + permission;
     }
 
-    public static Permission fromString(String permission){
+    public static Permission fromString(String permission) {
         String onlyPerm;
-        if(permission.startsWith("-")){
+        if (permission.startsWith("-")) {
             onlyPerm = permission.substring(1, permission.length());
-        }
-        else{
+        } else {
             onlyPerm = permission;
         }
         return new Permission(onlyPerm, !permission.startsWith("-"));

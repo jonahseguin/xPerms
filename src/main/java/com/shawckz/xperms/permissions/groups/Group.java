@@ -23,7 +23,7 @@ public class Group {
     private Permissions groupPermissions;
     private SubGroups subGroups;
 
-    public Permissions getPermissions(){
+    public Permissions getPermissions() {
         return subGroups.getAllPermissions();
     }
 

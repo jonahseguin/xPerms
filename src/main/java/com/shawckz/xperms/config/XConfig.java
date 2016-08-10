@@ -3,8 +3,9 @@ package com.shawckz.xperms.config;
 import com.shawckz.xperms.config.annotations.ConfigData;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.bukkit.plugin.Plugin;
+
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -14,6 +15,7 @@ public class XConfig extends Configuration {
         super(plugin);
     }
 
-    @ConfigData("server-name") private String server;
+    @ConfigData("server-name")
+    private String server = UUID.randomUUID().toString();
 
 }

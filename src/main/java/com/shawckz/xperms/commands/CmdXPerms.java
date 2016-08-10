@@ -3,7 +3,6 @@ package com.shawckz.xperms.commands;
 import com.shawckz.xperms.command.GCmd;
 import com.shawckz.xperms.command.GCmdArgs;
 import com.shawckz.xperms.command.GCommand;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
