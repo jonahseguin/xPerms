@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.plugin.Plugin;
 
-import java.util.UUID;
-
 @Getter
 @Setter
 public class XConfig extends Configuration {
@@ -16,6 +14,6 @@ public class XConfig extends Configuration {
     }
 
     @ConfigData("server-name")
-    private String server = UUID.randomUUID().toString();
+    private String server = "default";
 
 }
