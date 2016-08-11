@@ -1,10 +1,12 @@
 package com.shawckz.xperms.permissions.groups;
 
-import com.shawckz.xperms.XPerms;
 import com.shawckz.xperms.permissions.perms.Permission;
 import com.shawckz.xperms.permissions.perms.Permissions;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.mongodb.morphia.annotations.Embedded;
+import org.mongodb.morphia.annotations.Reference;
+import org.mongodb.morphia.annotations.Transient;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -14,12 +16,18 @@ import java.util.Set;
  */
 @RequiredArgsConstructor
 @Setter
+@Embedded
 public class SubGroups {
 
-    private final XPerms instance;
+    @Reference
     private Group superGroup;
-    private final Permissions allPermissions = new Permissions();
-    private final Set<Group> subGroups = new HashSet<>();
+
+    @Transient // Load this locally, TODO
+    private Permissions allPermissions = new Permissions();
+
+    @Reference
+    private Set<Group> subGroups = new HashSet<>();
+
 
     public boolean hasSubGroup(String groupName) {
         Group group = getSubGroup(groupName);
@@ -35,7 +43,7 @@ public class SubGroups {
 
     public void addSubGroup(Group group) {
         subGroups.add(group);
-        refreshPermissions();
+        refreshGroupPermissions();
     }
 
     public boolean removeSubGroup(String groupName) {
@@ -58,7 +66,7 @@ public class SubGroups {
     public boolean removeSubGroup(Group group) {
         boolean found = subGroups.remove(group);
         if (found) {
-            refreshPermissions();
+            refreshGroupPermissions();
         }
         return found;
     }
@@ -71,7 +79,7 @@ public class SubGroups {
         return allPermissions;
     }
 
-    private void refreshPermissions() {
+    public void refreshGroupPermissions() {
         this.allPermissions.getPermissions().clear();
         for (Group subGroup : subGroups) {
             for (Permission permission : subGroup.getPermissions().getPermissions().values()) {

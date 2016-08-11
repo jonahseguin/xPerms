@@ -4,46 +4,62 @@ import com.shawckz.xperms.XPerms;
 import com.shawckz.xperms.permissions.PermServer;
 import com.shawckz.xperms.permissions.groups.Group;
 import lombok.Getter;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Reference;
+import org.mongodb.morphia.annotations.Transient;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by 360 on 9/21/2015.
  */
 @Getter
+@Entity("xperms_profile_groupsets")
 public class ProfileGroupSet {
 
-    private final XPerms instance;
-    private final Map<PermServer, XProfileGroupSet> groups;
+    @Transient
+    private XPerms instance;
+    @Reference
+    private PermServer permServer;
+    private Set<String> groups;
 
-    public ProfileGroupSet(XPerms instance) {
-        this.instance = instance;
-        this.groups = new HashMap<>();
+    public ProfileGroupSet() {
     }
 
-    public ProfileGroupSet(XPerms instance, Map<PermServer, XProfileGroupSet> groups) {
+    public ProfileGroupSet(XPerms instance, PermServer server) {
         this.instance = instance;
+        this.permServer = server;
+        this.groups = new HashSet<>();
+    }
+
+    public ProfileGroupSet(XPerms instance, PermServer server, Set<String> groups) {
+        this.instance = instance;
+        this.permServer = server;
         this.groups = groups;
     }
 
-    public Group getGroup(PermServer server, String name) {
-        return getGroupSet(server).getGroup(name);
+    public boolean hasGroup(Group group) {
+        return hasGroup(group.getName());
     }
 
-    public Group getLocalGroup(String name) {
-        return getGroup(instance.getPermServer(), name);
+    public boolean hasGroup(String groupName) {
+        return groups.contains(groupName);
     }
 
-    public XProfileGroupSet getGroupSet(PermServer permServer) {
-        if (!groups.containsKey(permServer)) {
-            groups.put(permServer, new XProfileGroupSet(instance, permServer));
+    public void saveGroup(Group group) {
+        groups.add(group.getName());
+    }
+
+    public void removeGroup(Group group) {
+        groups.remove(group.getName());
+    }
+
+    public Group getGroup(String groupName) {
+        if (groups.contains(groupName)) {
+            return instance.getGroupManager().getGroup(permServer, groupName);
         }
-        return groups.get(permServer);
+        return null;
     }
 
-    public void saveGroup(PermServer permServer, Group group) {
-        getGroupSet(permServer).saveGroup(group);
-    }
 }

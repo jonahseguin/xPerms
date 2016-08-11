@@ -5,7 +5,10 @@ import com.shawckz.xperms.permissions.PermServer;
 import com.shawckz.xperms.permissions.perms.Permissions;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.*;
 
 /**
  * Created by 360 on 9/21/2015.
@@ -13,14 +16,23 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
+@Entity("xperms_groups")
 public class Group {
 
-    private final XPerms instance;
-    private final PermServer permServer;
+    @Id
+    private ObjectId id;
+
+    @Transient
+    private XPerms instance;
+    @Reference
+    private PermServer permServer;
     private String name;
     private String prefix;
     private String suffix;
+    @Embedded
     private Permissions groupPermissions;
+    @Embedded
     private SubGroups subGroups;
 
     public Permissions getPermissions() {

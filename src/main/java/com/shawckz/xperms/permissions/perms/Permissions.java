@@ -3,6 +3,7 @@ package com.shawckz.xperms.permissions.perms;
 import com.shawckz.xperms.exception.PermissionsException;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.mongodb.morphia.annotations.Embedded;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,8 +13,10 @@ import java.util.Map;
  */
 @AllArgsConstructor//Set<String> constructor
 @RequiredArgsConstructor//Empty constructor
+@Embedded
 public class Permissions {
 
+    @Embedded
     private Map<String, Permission> permissions = new HashMap<>();
 
     public void addPermission(String permission) {

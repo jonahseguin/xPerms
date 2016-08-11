@@ -3,7 +3,6 @@ package com.shawckz.xperms.permissions.groups;
 
 import com.mongodb.BasicDBObject;
 import com.shawckz.xperms.XPerms;
-import com.shawckz.xperms.database.mongo.AutoMongo;
 import com.shawckz.xperms.permissions.PermServer;
 
 import java.util.List;
@@ -23,10 +22,10 @@ public class GroupManager {
 
     public void loadGroups() {
         int loadedGroups = 0;
-        List<AutoMongo> cursor = DatabaseGroupContainer.select(instance, new BasicDBObject(), DatabaseGroupContainer.class);
+        List<AutoMongo> cursor = WrapperDatabaseGroup.select(instance, new BasicDBObject(), WrapperDatabaseGroup.class);
         for (AutoMongo result : cursor) {
-            if (result instanceof DatabaseGroupContainer) {
-                DatabaseGroupContainer container = (DatabaseGroupContainer) result;
+            if (result instanceof WrapperDatabaseGroup) {
+                WrapperDatabaseGroup container = (WrapperDatabaseGroup) result;
                 registerGroup(container.getPermServer(), container.getGroup());
                 loadedGroups++;
             }
@@ -39,7 +38,7 @@ public class GroupManager {
         for (PermServer permServer : groupSet.getGroups().keySet()) {
             XGroupSet xGroupSet = groupSet.getGroupSet(permServer);
             for (Group group : xGroupSet.getGroups().values()) {
-                DatabaseGroupContainer container = new DatabaseGroupContainer(instance, permServer, group);
+                WrapperDatabaseGroup container = new WrapperDatabaseGroup(instance, permServer, group);
                 container.update();
                 savedGroups++;
             }

@@ -7,7 +7,6 @@ package com.shawckz.xperms.profile.internal;
 
 
 import com.shawckz.xperms.XPerms;
-import com.shawckz.xperms.database.mongo.AutoMongo;
 
 /**
  * Created by Jonah on 6/11/2015.

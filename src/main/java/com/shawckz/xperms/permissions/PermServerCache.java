@@ -2,7 +2,6 @@ package com.shawckz.xperms.permissions;
 
 import com.mongodb.BasicDBObject;
 import com.shawckz.xperms.XPerms;
-import com.shawckz.xperms.database.mongo.AutoMongo;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;

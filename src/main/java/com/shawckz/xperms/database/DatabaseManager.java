@@ -9,6 +9,8 @@ import com.shawckz.xperms.config.Configuration;
 import com.shawckz.xperms.config.annotations.ConfigData;
 import com.shawckz.xperms.exception.PermissionsException;
 import org.bukkit.plugin.Plugin;
+import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.Morphia;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -24,14 +26,16 @@ import java.util.Arrays;
 public class DatabaseManager extends Configuration {
 
     private static boolean instantiated = false;
-    private MongoClient mongoClient;
-    private MongoDatabase db;
-    private JedisPool jedisPool;
+
+    private final MongoClient mongoClient;
+    private final MongoDatabase db;
+    private final JedisPool jedisPool;
+    private final Morphia morphia;
+    private final Datastore datastore;
 
     /*
     MONGO
      */
-
     @ConfigData("database.mongo.name")
     private static String mongoDatabaseName = "minecraft";
 
@@ -56,7 +60,6 @@ public class DatabaseManager extends Configuration {
     /*
     REDIS
      */
-
     @ConfigData("database.redis.use-redis")
     private boolean useRedis = false;
 
@@ -72,6 +75,7 @@ public class DatabaseManager extends Configuration {
     @ConfigData("database.redis.password")
     private String redisPassword = "password";
 
+
     public DatabaseManager(Plugin plugin) {
         super(plugin, "database.yml");
         if (!instantiated) {
@@ -81,10 +85,7 @@ public class DatabaseManager extends Configuration {
         }
         load();
         save();
-        setup();
-    }
 
-    private void setup() {
         if (useMongoAuth) {
             MongoCredential credential = MongoCredential.createCredential(mongoUsername, mongoAuthDatabaseName, mongoPassword.toCharArray());
             MongoClientOptions options = MongoClientOptions.builder().connectionsPerHost(50).build();
@@ -97,8 +98,14 @@ public class DatabaseManager extends Configuration {
 
         if (useRedis) {
             jedisPool = new JedisPool(new JedisPoolConfig(), redisHost, redisPort);
+        } else {
+            jedisPool = null;
         }
 
+        morphia = new Morphia();
+        morphia.mapPackage("com.shawckz.xperms");
+        datastore = morphia.createDatastore(mongoClient, mongoDatabaseName);
+        datastore.ensureIndexes();
     }
 
     public Jedis getJedisResource() {
@@ -116,9 +123,6 @@ public class DatabaseManager extends Configuration {
     public void shutdown() {
         mongoClient.close();
         jedisPool.close();
-        jedisPool = null;
-        db = null;
-        mongoClient = null;
     }
 
     public boolean isRedisEnabled() {
@@ -129,15 +133,16 @@ public class DatabaseManager extends Configuration {
         return db;
     }
 
-    public void setDb(MongoDatabase db) {
-        this.db = db;
-    }
-
     public MongoClient getMongoClient() {
         return mongoClient;
     }
 
-    public void setMongoClient(MongoClient mongoClient) {
-        this.mongoClient = mongoClient;
+    public Morphia getMorphia() {
+        return morphia;
     }
+
+    public Datastore getDataStore() {
+        return datastore;
+    }
+
 }

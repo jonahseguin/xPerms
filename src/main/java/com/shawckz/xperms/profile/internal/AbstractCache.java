@@ -2,7 +2,6 @@ package com.shawckz.xperms.profile.internal;
 
 import com.mongodb.BasicDBObject;
 import com.shawckz.xperms.XPerms;
-import com.shawckz.xperms.database.mongo.AutoMongo;
 import com.shawckz.xperms.database.mongo.annotations.MongoColumn;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

@@ -1,17 +1,30 @@
 package com.shawckz.xperms.permissions.perms;
 
-import lombok.Data;
-import lombok.NonNull;
+import lombok.Getter;
+import org.mongodb.morphia.annotations.Embedded;
 
 /**
  * Created by 360 on 9/21/2015.
  */
-@Data
+@Getter
+@Embedded
 public class Permission {
 
-    private final String permission;
-    @NonNull
+    private String permission;
     private boolean value;
+
+    public Permission() {
+        //Empty constructor
+    }
+
+    public Permission(String permission, boolean value) {
+        this.permission = permission;
+        this.value = value;
+    }
+
+    public void setValue(boolean value) {
+        this.value = value;
+    }
 
     @Override
     public String toString() {
