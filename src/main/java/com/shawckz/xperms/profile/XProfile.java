@@ -4,16 +4,14 @@ import com.shawckz.xperms.XPerms;
 import com.shawckz.xperms.permissions.groups.Group;
 import com.shawckz.xperms.permissions.groups.profile.WrapperProfileGroupSet;
 import com.shawckz.xperms.permissions.perms.Permission;
+import com.shawckz.xperms.permissions.perms.Permissions;
 import com.shawckz.xperms.profile.internal.CachePlayer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
-import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.Reference;
-import org.mongodb.morphia.annotations.Transient;
+import org.mongodb.morphia.annotations.*;
 
 @Getter
 @Setter
@@ -29,6 +27,9 @@ public class XProfile extends CachePlayer {
 
     @Reference
     private WrapperProfileGroupSet groups;
+
+    @Embedded
+    private Permissions permissions = new Permissions();
 
     /* Local Variables */
     @Transient
@@ -79,6 +80,12 @@ public class XProfile extends CachePlayer {
                 permissionAttachment.setPermission(permission.getPermission(), permission.isValue());
             }
         }
+        //Load per-player permissions, which overrides any conflicting GLOBAL and LOCAL permissions
+        permissions.getPermissions()
+                .values()
+                .forEach(
+                        permission -> permissionAttachment.setPermission(permission.getPermission(), permission.isValue())
+                );
     }
 
 }
