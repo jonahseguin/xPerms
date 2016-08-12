@@ -4,7 +4,7 @@ import com.shawckz.xperms.XPerms;
 import com.shawckz.xperms.permissions.PermServer;
 import com.shawckz.xperms.permissions.groups.Group;
 import lombok.Getter;
-import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Reference;
 import org.mongodb.morphia.annotations.Transient;
 
@@ -15,7 +15,7 @@ import java.util.Set;
  * Created by 360 on 9/21/2015.
  */
 @Getter
-@Entity("xperms_profile_groupsets")
+@Embedded
 public class ProfileGroupSet {
 
     @Transient

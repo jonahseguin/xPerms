@@ -7,7 +7,7 @@ import com.shawckz.xperms.database.DatabaseManager;
 import com.shawckz.xperms.permissions.PermServer;
 import com.shawckz.xperms.permissions.PermServerCache;
 import com.shawckz.xperms.permissions.groups.GroupManager;
-import com.shawckz.xperms.profile.XCache;
+import com.shawckz.xperms.profile.ProfileCache;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class XPerms extends JavaPlugin {
@@ -18,7 +18,7 @@ public class XPerms extends JavaPlugin {
     private XConfig config;
     private DatabaseManager databaseManager;
     private GroupManager groupManager;
-    private XCache cache;
+    private ProfileCache cache;
     private PermServerCache serverCache;
 
     @Override
@@ -27,11 +27,11 @@ public class XPerms extends JavaPlugin {
         this.config = new XConfig(this);
         this.config.load();
         this.config.save();
-        serverCache = new PermServerCache(new PermServer(this, this.config.getServer()), new PermServer(this, GLOBAL_SERVER));
+        serverCache = new PermServerCache(new PermServer(this.config.getServer()), new PermServer(GLOBAL_SERVER));
         this.databaseManager = new DatabaseManager(this);
         this.groupManager = new GroupManager(this);
         this.groupManager.loadGroups();
-        this.cache = new XCache(this);
+        this.cache = new ProfileCache(this);
 
         GCommandHandler cmd = new GCommandHandler(this);
         cmd.registerCommands(new CmdXPerms());
@@ -53,7 +53,7 @@ public class XPerms extends JavaPlugin {
         return instance;
     }
 
-    public XCache getCache() {
+    public ProfileCache getCache() {
         return cache;
     }
 

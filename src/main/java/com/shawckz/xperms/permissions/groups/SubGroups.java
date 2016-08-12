@@ -5,6 +5,7 @@ import com.shawckz.xperms.permissions.perms.Permissions;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.mongodb.morphia.annotations.Embedded;
+import org.mongodb.morphia.annotations.PostLoad;
 import org.mongodb.morphia.annotations.Reference;
 import org.mongodb.morphia.annotations.Transient;
 
@@ -22,12 +23,18 @@ public class SubGroups {
     @Reference
     private Group superGroup;
 
-    @Transient // Load this locally, TODO
+    @Transient
     private Permissions allPermissions = new Permissions();
 
     @Reference
     private Set<Group> subGroups = new HashSet<>();
 
+    @PostLoad
+    public void onPostLoad() {
+        // Called by ODM, after object is loaded from database
+        // Refresh our local allPermissions
+        refreshGroupPermissions();
+    }
 
     public boolean hasSubGroup(String groupName) {
         Group group = getSubGroup(groupName);

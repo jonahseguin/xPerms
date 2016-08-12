@@ -30,7 +30,7 @@ public class CmdAddGroup implements GCommand {
                         if (!profile.getGroups().getGroupSet(permServer).hasGroup(group)) {
                             profile.getGroups().getGroupSet(permServer).saveGroup(group);
                             profile.refreshPermissions();
-                            profile.update();
+                            profile.saveProfile();
                             sender.sendMessage(ChatColor.GREEN + "Added group " + group.getName() + " to " + profile.getName()
                                     + " for server " + permServer.getName() + ".");
                         } else {

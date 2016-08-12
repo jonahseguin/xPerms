@@ -1,11 +1,9 @@
 package com.shawckz.xperms.permissions;
 
-import com.mongodb.BasicDBObject;
 import com.shawckz.xperms.XPerms;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class PermServerCache {
@@ -35,12 +33,9 @@ public class PermServerCache {
         new BukkitRunnable() {
             @Override
             public void run() {
-                List<AutoMongo> mongos = PermServer.select(
-                        XPerms.getInstance(), new BasicDBObject(), PermServer.class);
-                mongos.stream()
-                        .filter(mongo -> mongo instanceof PermServer)
-                        .forEach(mongo -> {
-                            PermServer permServer = (PermServer) mongo;
+                XPerms.getInstance().getDatabaseManager().getDataStore().createQuery(PermServer.class)
+                        .asList()
+                        .forEach(permServer -> {
                             servers.put(permServer.getName().toLowerCase(), permServer);
                         });
             }
@@ -53,7 +48,7 @@ public class PermServerCache {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    server.update();
+                    XPerms.getInstance().getDatabaseManager().getDataStore().save(server);
                 }
             }.runTaskAsynchronously(XPerms.getInstance());
         }

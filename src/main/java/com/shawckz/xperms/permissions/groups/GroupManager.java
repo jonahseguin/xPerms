@@ -1,11 +1,8 @@
 package com.shawckz.xperms.permissions.groups;
 
 
-import com.mongodb.BasicDBObject;
 import com.shawckz.xperms.XPerms;
 import com.shawckz.xperms.permissions.PermServer;
-
-import java.util.List;
 
 /**
  * Created by 360 on 9/21/2015.
@@ -13,33 +10,27 @@ import java.util.List;
 public class GroupManager {
 
     private final XPerms instance;
-    private final GroupSet groupSet;
+    private final GroupCache groupSet;
 
     public GroupManager(XPerms instance) {
         this.instance = instance;
-        this.groupSet = new GroupSet(instance);
+        this.groupSet = new GroupCache(instance);
     }
 
     public void loadGroups() {
-        int loadedGroups = 0;
-        List<AutoMongo> cursor = WrapperDatabaseGroup.select(instance, new BasicDBObject(), WrapperDatabaseGroup.class);
-        for (AutoMongo result : cursor) {
-            if (result instanceof WrapperDatabaseGroup) {
-                WrapperDatabaseGroup container = (WrapperDatabaseGroup) result;
-                registerGroup(container.getPermServer(), container.getGroup());
-                loadedGroups++;
-            }
-        }
-        XPerms.log("Loaded " + loadedGroups + " groups into the cache.");
+        instance.getDatabaseManager().getDataStore()
+                .createQuery(Group.class)
+                .asList()
+                .forEach(group -> registerGroup(group.getPermServer(), group));
+        XPerms.log("Loaded groups into the cache.");
     }
 
     public void saveGroups() {
         int savedGroups = 0;
         for (PermServer permServer : groupSet.getGroups().keySet()) {
-            XGroupSet xGroupSet = groupSet.getGroupSet(permServer);
+            GroupSet xGroupSet = groupSet.getGroupSet(permServer);
             for (Group group : xGroupSet.getGroups().values()) {
-                WrapperDatabaseGroup container = new WrapperDatabaseGroup(instance, permServer, group);
-                container.update();
+                instance.getDatabaseManager().getDataStore().save(group);
                 savedGroups++;
             }
         }
@@ -62,7 +53,7 @@ public class GroupManager {
         return getGroupSet(server).getGroup(groupName);
     }
 
-    public XGroupSet getGroupSet(PermServer server) {
+    public GroupSet getGroupSet(PermServer server) {
         return groupSet.getGroupSet(server);
     }
 

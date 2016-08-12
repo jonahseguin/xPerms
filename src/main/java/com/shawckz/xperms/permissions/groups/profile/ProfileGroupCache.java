@@ -4,8 +4,8 @@ import com.shawckz.xperms.XPerms;
 import com.shawckz.xperms.permissions.PermServer;
 import com.shawckz.xperms.permissions.groups.Group;
 import lombok.Getter;
+import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Reference;
 import org.mongodb.morphia.annotations.Transient;
 
 import java.util.HashMap;
@@ -16,25 +16,25 @@ import java.util.Map;
  * Created by 360 on 9/21/2015.
  */
 @Getter
-@Entity("xperms_wrapper_profile_groupsets")
-public class WrapperProfileGroupSet {
+@Entity("xperms_profile_groupsets")
+public class ProfileGroupCache {
 
     @Transient
     private final XPerms instance;
 
-    @Reference
+    @Embedded
     private Map<PermServer, ProfileGroupSet> groups;
 
-    public WrapperProfileGroupSet() {
+    public ProfileGroupCache() {
         this.instance = XPerms.getInstance();
     }
 
-    public WrapperProfileGroupSet(XPerms instance) {
+    public ProfileGroupCache(XPerms instance) {
         this.instance = instance;
         this.groups = new HashMap<>();
     }
 
-    public WrapperProfileGroupSet(XPerms instance, Map<PermServer, ProfileGroupSet> groups) {
+    public ProfileGroupCache(XPerms instance, Map<PermServer, ProfileGroupSet> groups) {
         this.instance = instance;
         this.groups = groups;
     }

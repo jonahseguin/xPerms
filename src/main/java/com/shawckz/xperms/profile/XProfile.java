@@ -2,10 +2,9 @@ package com.shawckz.xperms.profile;
 
 import com.shawckz.xperms.XPerms;
 import com.shawckz.xperms.permissions.groups.Group;
-import com.shawckz.xperms.permissions.groups.profile.WrapperProfileGroupSet;
+import com.shawckz.xperms.permissions.groups.profile.ProfileGroupCache;
 import com.shawckz.xperms.permissions.perms.Permission;
 import com.shawckz.xperms.permissions.perms.Permissions;
-import com.shawckz.xperms.profile.internal.CachePlayer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -16,7 +15,7 @@ import org.mongodb.morphia.annotations.*;
 @Getter
 @Setter
 @Entity("xperms_profiles")
-public class XProfile extends CachePlayer {
+public class XProfile {
 
     @Id
     private ObjectId id;
@@ -26,7 +25,7 @@ public class XProfile extends CachePlayer {
     private String name;
 
     @Reference
-    private WrapperProfileGroupSet groups;
+    private ProfileGroupCache groups;
 
     @Embedded
     private Permissions permissions = new Permissions();
@@ -40,18 +39,16 @@ public class XProfile extends CachePlayer {
     private PermissionAttachment permissionAttachment;
 
     public XProfile(XPerms instance) {
-        super(instance);
         this.instance = instance;
         //Keep empty constructor so that AutoMongo can instantiate
-        this.groups = new WrapperProfileGroupSet(instance);
+        this.groups = new ProfileGroupCache(instance);
     }
 
     public XProfile(XPerms instance, String uniqueId, String name) {
-        super(instance);
         this.instance = instance;
         this.uniqueId = uniqueId;
         this.name = name;
-        this.groups = new WrapperProfileGroupSet(instance);
+        this.groups = new ProfileGroupCache(instance);
     }
 
     /**
@@ -59,6 +56,7 @@ public class XProfile extends CachePlayer {
      * Should be called after applying modifying groups or permissions
      * Loads global and then local permissions, so that local permissions
      * override global permissions.
+     * Per-player permissions override any and all conflicting permissions
      */
     public void refreshPermissions() {
         if (permissionAttachment != null) {
@@ -86,6 +84,10 @@ public class XProfile extends CachePlayer {
                 .forEach(
                         permission -> permissionAttachment.setPermission(permission.getPermission(), permission.isValue())
                 );
+    }
+
+    public void saveProfile() {
+        instance.getDatabaseManager().getDataStore().save(this);
     }
 
 }

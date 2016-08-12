@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Created by 360 on 9/21/2015.
  */
-@AllArgsConstructor//Set<String> constructor
+@AllArgsConstructor//Mapa<String,Perm> constructor
 @RequiredArgsConstructor//Empty constructor
 @Embedded
 public class Permissions {
