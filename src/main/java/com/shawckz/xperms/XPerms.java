@@ -1,6 +1,7 @@
 package com.shawckz.xperms;
 
 import com.shawckz.xperms.command.GCommandHandler;
+import com.shawckz.xperms.commands.CmdAddGroup;
 import com.shawckz.xperms.commands.CmdXPerms;
 import com.shawckz.xperms.config.XConfig;
 import com.shawckz.xperms.database.DatabaseManager;
@@ -35,6 +36,7 @@ public class XPerms extends JavaPlugin {
 
         GCommandHandler cmd = new GCommandHandler(this);
         cmd.registerCommands(new CmdXPerms());
+        cmd.registerCommands(new CmdAddGroup());
         //TODO: Register commands
     }
 
