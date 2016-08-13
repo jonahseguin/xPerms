@@ -37,7 +37,6 @@ public class XPerms extends JavaPlugin {
         GCommandHandler cmd = new GCommandHandler(this);
         cmd.registerCommands(new CmdXPerms());
         cmd.registerCommands(new CmdAddGroup());
-        //TODO: Register commands
     }
 
     @Override

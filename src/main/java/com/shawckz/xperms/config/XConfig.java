@@ -16,4 +16,16 @@ public class XConfig extends Configuration {
     @ConfigData("server-name")
     private String server = "default";
 
+    @ConfigData("profile-cache.async-caching")
+    private boolean asyncCaching = false;
+
+    @ConfigData("profile-cache.fail-retry-interval-seconds")
+    private int cacheFailIntervalSeconds = 180; // 3 minutes
+
+    @ConfigData("profile-cache.failure-handling")
+    private boolean cacheFailureHandling = true;
+
+    @ConfigData("profile-cache.remove-on-disconnect")
+    private boolean cacheRemoveOnQuit = false; // Default to false, the cache cleanup will handle it later
+
 }
