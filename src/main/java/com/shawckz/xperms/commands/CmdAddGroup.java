@@ -14,7 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class CmdAddGroup implements GCommand {
 
     @GCmd(name = "xperms addgroup", aliases = {"perms addgroup"}, permission = "xperms.addgroup",
-            usage = "/xperms addgroup <player> <server> <groups>", minArgs = 3)
+            usage = "/xperms addgroup <player> <server> <group>", minArgs = 3)
     public void onCmdAddGroup(final GCmdArgs args) {
         final CommandSender sender = args.getSender().getCommandSender();
 

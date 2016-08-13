@@ -3,6 +3,7 @@ package com.shawckz.xperms.permissions.groups;
 
 import com.shawckz.xperms.XPerms;
 import com.shawckz.xperms.permissions.PermServer;
+import com.shawckz.xperms.profile.XProfile;
 
 /**
  * Created by 360 on 9/21/2015.
@@ -55,6 +56,15 @@ public class GroupManager {
 
     public GroupSet getGroupSet(PermServer server) {
         return groupSet.getGroupSet(server);
+    }
+
+    public void refreshPlayerPermissions() {
+        instance.getServer().getOnlinePlayers().forEach(player -> {
+            XProfile profile = instance.getCache().getLocalProfile(player);
+            if (profile != null) {
+                profile.refreshPermissions();
+            }
+        });
     }
 
 }

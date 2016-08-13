@@ -206,6 +206,10 @@ public class ProfileCache implements Listener {
         }
     }
 
+    public XProfile getProfile(Player player) {
+        return getProfile(player.getUniqueId().toString());
+    }
+
     public XProfile getProfile(String uniqueId) {
         if (hasProfileCachedLocally(uniqueId)) {
             return getLocalProfile(uniqueId);
@@ -223,6 +227,10 @@ public class ProfileCache implements Listener {
 
     public XProfile getLocalProfile(String uniqueId) {
         return accessProfile(cache.get(uniqueId.toLowerCase()));
+    }
+
+    public XProfile getLocalProfile(Player player) {
+        return getLocalProfile(player.getUniqueId().toString());
     }
 
     public XProfile getRedisProfile(String uniqueId) {
