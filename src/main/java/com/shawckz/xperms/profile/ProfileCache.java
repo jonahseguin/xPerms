@@ -1,13 +1,16 @@
 package com.shawckz.xperms.profile;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.shawckz.xperms.XPerms;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.mongodb.morphia.query.Query;
 
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -15,12 +18,121 @@ import java.util.stream.Stream;
 
 public class ProfileCache implements Listener {
 
+    public static final long CACHE_EXPIRY_MINUTES = 60;
+
     private final XPerms instance;
-    private final ConcurrentMap<String, XProfile> cache = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, CachedProfile> cache = new ConcurrentHashMap<>();
+    private final BiMap<String, String> usernameCache = HashBiMap.create(); // <UniqueID, Username>
+    private final RedisProfileCache redis;
 
     public ProfileCache(XPerms plugin) {
         this.instance = plugin;
+        this.redis = new RedisProfileCache(plugin);
         instance.getServer().getPluginManager().registerEvents(this, instance);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                cleanupCache();
+                XPerms.log("Cleaned the local cache");
+            }
+        }.runTaskTimerAsynchronously(XPerms.getInstance(), (20 * 60 * 15), (20 * 60 * 15)); //Every 15 minutes
+    }
+
+    public XProfile getProfileByName(String username) {
+        String uniqueId = convertToUniqueId(username);
+        if (uniqueId != null) {
+            //In username -> uniqueId conversion cache
+            return getProfile(uniqueId);
+        } else {
+            //Not in username -> uniqueId conversion cache, query mongo
+            //TODO
+            return null; //TODO TODO TODO TODO
+        }
+    }
+
+    public XProfile getProfile(String uniqueId) {
+        if (hasProfileCachedLocally(uniqueId)) {
+            return getLocalProfile(uniqueId);
+        } else if (hasProfileCachedRedis(uniqueId)) {
+            return cacheLocally(uniqueId, getRedisProfile(uniqueId));
+        } else {
+            XProfile profile = getMongoProfile(uniqueId);
+            if (profile != null) {
+                return profile;
+            } else {
+                return null;
+            }
+        }
+    }
+
+    public XProfile handleCache(String name, String uniqueId) {
+        usernameCache.put(uniqueId, name);
+        if (hasProfileCachedLocally(uniqueId)) {
+            return getLocalProfile(uniqueId);
+        } else if (hasProfileCachedRedis(uniqueId)) {
+            // Get from Redis, add to local cache
+            XProfile profile = getRedisProfile(uniqueId);
+            if (!name.equalsIgnoreCase(profile.getName())) {
+                // Update username if it has changed
+                profile.setName(name);
+                saveProfileRedis(profile);
+                saveProfileMongo(profile);
+            }
+            return cacheLocally(uniqueId, profile);
+        } else {
+            // Not cached, check database or create
+            XProfile profile = getMongoProfile(uniqueId);
+            if (profile != null) {
+                if (!name.equalsIgnoreCase(profile.getName())) {
+                    // Update username if it has changed
+                    profile.setName(name);
+                    saveProfileMongo(profile);
+                }
+                saveProfileRedis(profile);
+                return cacheLocally(uniqueId, profile);
+            } else {
+                // Not in database, create
+                profile = createProfile(name, uniqueId);
+                saveProfileEverywhere(profile);
+                return profile;
+            }
+        }
+    }
+
+    public void saveProfileEverywhere(XProfile profile) {
+        cacheLocally(profile.getUniqueId(), profile);
+        saveProfileRedis(profile);
+        saveProfileMongo(profile);
+    }
+
+    public void saveProfileRedis(XProfile profile) {
+        BasicDBObject dbObject = (BasicDBObject) instance.getDatabaseManager().getMorphia().toDBObject(profile);
+        redis.cache(profile.getUniqueId(), dbObject.toJson());
+    }
+
+    public void saveProfileMongo(XProfile profile) {
+        instance.getDatabaseManager().getDataStore().save(profile);
+    }
+
+    private XProfile accessProfile(CachedProfile profile) {
+        profile.setExpiry(System.currentTimeMillis());
+        return profile.getProfile();
+    }
+
+    public String convertToName(String uniqueId) {
+        if (usernameCache.containsKey(uniqueId)) {
+            return usernameCache.get(uniqueId);
+        }
+        return null;
+    }
+
+    public String convertToUniqueId(String name) {
+        BiMap<String, String> inverse = usernameCache.inverse();
+        if (inverse.containsKey(name)) {
+            return inverse.get(name);
+        }
+        return null;
     }
 
     public XProfile createProfile(String name, String uuid) {
@@ -32,77 +144,56 @@ public class ProfileCache implements Listener {
         profile.refreshPermissions();
     }
 
-    public XProfile getLocalProfile(String name) {
-        return cache.get(name.toLowerCase());
-    }
-
-    public boolean hasProfileCached(String name) {
-        return cache.containsKey(name.toLowerCase());
-    }
-
-    public XProfile cacheProfile(XProfile profile) {
-        cache.put(profile.getName().toLowerCase(), profile);
+    public XProfile cacheLocally(String uniqueId, XProfile profile) {
+        CachedProfile cachedProfile = new CachedProfile(profile, System.currentTimeMillis(), getNewCacheExpiry());
+        cache.put(uniqueId, cachedProfile);
         return profile;
     }
 
-    public XProfile lookupProfile(String name) {
-        Player targetPlayer = Bukkit.getPlayer(name);
-        if (targetPlayer != null) {
-            name = targetPlayer.getName();
-        }
-        return getProfile(name);
+    public XProfile getLocalProfile(String uniqueId) {
+        return accessProfile(cache.get(uniqueId.toLowerCase()));
     }
 
-    public XProfile loadProfileSync(String name) {
+    public boolean hasProfileCachedLocally(String uniqueId) {
+        return cache.containsKey(uniqueId.toLowerCase());
+    }
+
+    public boolean hasProfileCachedRedis(String uniqueId) {
+        return redis.inCache(uniqueId);
+    }
+
+    public XProfile getRedisProfile(String uniqueId) {
+        String json = redis.getFromCache(uniqueId);
+        DBObject dbObject = BasicDBObject.parse(json);
+        return instance.getDatabaseManager().getMorphia().fromDBObject(instance.getDatabaseManager().getDataStore(),
+                XProfile.class, dbObject);
+    }
+
+    public XProfile getMongoProfile(String uniqueId) {
         Query<XProfile> q = instance.getDatabaseManager().getDataStore().createQuery(XProfile.class);
-        q.criteria("name").equalIgnoreCase(name);
+        q.criteria("uniqueId").equalIgnoreCase(uniqueId);
         Stream<XProfile> stream = q.asList().stream();
         Optional<XProfile> xp = stream.findFirst();
         return xp.isPresent() ? xp.get() : null;
     }
 
-    public XProfile loadProfileAndCacheSync(String name) {
-        XProfile profile = loadProfileSync(name);
-        if (profile != null) {
-            return profile;
-        } else {
-            return null;
-        }
+    private long getNewCacheExpiry() {
+        return System.currentTimeMillis() + (1000 * 60 * CACHE_EXPIRY_MINUTES);
     }
 
-    public XProfile loadOrCreateProfileSync(String name, String uniqueId) {
-        if (hasProfileCached(name)) {
-            return getLocalProfile(name);
-        } else {
-            XProfile profile = loadProfileSync(name);
-            if (profile != null) {
-                return profile;
-            } else {
-                return createProfile(name, uniqueId);
+    /**
+     * Remove expired CachedProfiles
+     */
+    public void cleanupCache() {
+        Iterator<String> it = cache.keySet().iterator();
+        while (it.hasNext()) {
+            String key = it.next();
+            CachedProfile profile = cache.get(key);
+            if (System.currentTimeMillis() >= profile.getExpiry() && (profile.getProfile().getPlayer() == null || !profile.getProfile().getPlayer().isOnline())) {
+                cache.remove(key);
             }
         }
     }
 
-    public XProfile getProfile(String name) {
-        if (hasProfileCached(name)) {
-            return getLocalProfile(name);
-        } else {
-            return loadProfileAndCacheSync(name);
-        }
-    }
-
-    public XProfile getProfile(Player player) {
-        return getProfile(player.getName());
-    }
-
-    @EventHandler
-    public void onAsyncPreLogin(AsyncPlayerPreLoginEvent e) {
-        if (e.getLoginResult() == AsyncPlayerPreLoginEvent.Result.ALLOWED) {
-            final String username = e.getName();
-            final String uniqueId = e.getUniqueId().toString();
-
-            cacheProfile(loadOrCreateProfileSync(username, uniqueId));
-        }
-    }
 
 }

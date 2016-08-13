@@ -1,6 +1,5 @@
 package com.shawckz.xperms.profile;
 
-import com.shawckz.rongo.Cacheable;
 import com.shawckz.xperms.XPerms;
 import com.shawckz.xperms.permissions.groups.Group;
 import com.shawckz.xperms.permissions.groups.profile.ProfileGroupCache;
@@ -16,7 +15,7 @@ import org.mongodb.morphia.annotations.*;
 @Getter
 @Setter
 @Entity("xperms_profiles")
-public class XProfile implements Cacheable {
+public class XProfile {
 
     @Id
     private ObjectId id;
@@ -98,21 +97,7 @@ public class XProfile implements Cacheable {
     }
 
     public void saveProfile() {
-        instance.getDatabaseManager().getDataStore().save(this);
+        instance.getCache().saveProfileEverywhere(this);
     }
 
-    @Override
-    public String getIdentifier() {
-        return name;
-    }
-
-    @Override
-    public String getDatabaseIdentifier() {
-        return uniqueId;
-    }
-
-    @Override
-    public String toJSON() {
-        return null;
-    }
 }
