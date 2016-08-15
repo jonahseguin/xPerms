@@ -4,8 +4,16 @@
 
 package com.shawckz.xperms.command;
 
+import org.bukkit.ChatColor;
+import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.plugin.Plugin;
+
+import java.util.Set;
 
 /**
  * Created by Jonah Seguin on 12/13/2015.
@@ -13,7 +21,7 @@ import org.bukkit.entity.Player;
  * @author Shawckz
  *         Shawckz.com
  */
-public class GCommandSender {
+public class GCommandSender implements CommandSender {
 
     private final CommandSender sender;
 
@@ -34,4 +42,88 @@ public class GCommandSender {
         return sender instanceof Player;
     }
 
+    @Override
+    public void sendMessage(String s) {
+        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', s));
+    }
+
+    @Override
+    public void sendMessage(String[] strings) {
+        sender.sendMessage(strings);
+    }
+
+    @Override
+    public Server getServer() {
+        return sender.getServer();
+    }
+
+    @Override
+    public String getName() {
+        return sender.getName();
+    }
+
+    @Override
+    public boolean isPermissionSet(String s) {
+        return sender.isPermissionSet(s);
+    }
+
+    @Override
+    public boolean isPermissionSet(Permission permission) {
+        return sender.isPermissionSet(permission);
+    }
+
+    @Override
+    public boolean hasPermission(String s) {
+        return sender.hasPermission(s);
+    }
+
+    @Override
+    public boolean hasPermission(Permission permission) {
+        return sender.hasPermission(permission);
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin plugin, String s, boolean b) {
+        return sender.addAttachment(plugin, s, b);
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin plugin) {
+        return sender.addAttachment(plugin);
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin plugin, String s, boolean b, int i) {
+        return sender.addAttachment(plugin, s, b, i);
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin plugin, int i) {
+        return sender.addAttachment(plugin, i);
+    }
+
+    @Override
+    public void removeAttachment(PermissionAttachment permissionAttachment) {
+        sender.removeAttachment(permissionAttachment);
+    }
+
+    @Override
+    public void recalculatePermissions() {
+        sender.recalculatePermissions();
+    }
+
+    @Override
+    public Set<PermissionAttachmentInfo> getEffectivePermissions() {
+        return sender.getEffectivePermissions();
+    }
+
+    @Override
+    public boolean isOp() {
+        return sender.isOp();
+    }
+
+    @Override
+    public void setOp(boolean b) {
+        sender.setOp(b);
+    }
 }

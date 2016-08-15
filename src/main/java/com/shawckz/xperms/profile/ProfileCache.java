@@ -16,10 +16,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.mongodb.morphia.query.Query;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
@@ -137,23 +134,21 @@ public class ProfileCache implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
-        if (instance.getXConfig().isCacheRemoveOnQuit()) {
-            final Player p = e.getPlayer();
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (hasProfileCachedLocally(p.getUniqueId().toString())) {
-                        XProfile profile = removeFromLocalCache(getLocalProfile(p.getUniqueId().toString()));
-                        if (profile != null) {
-                            saveProfileRedis(profile);
-                            saveProfileMongo(profile);
-                            // Save in Redis and Mongo, but not locally because we just removed them from the local cache
-                            // Which is why I didn't use the profile.saveProfile method
-                        }
+        final Player p = e.getPlayer();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (hasProfileCachedLocally(p.getUniqueId().toString())) {
+                    XProfile profile = removeFromLocalCache(getLocalProfile(p.getUniqueId().toString()));
+                    if (profile != null) {
+                        saveProfileRedis(profile);
+                        saveProfileMongo(profile);
+                        // Save in Redis and Mongo, but not locally because we just removed them from the local cache
+                        // Which is why I didn't use the profile.saveProfile method
                     }
                 }
-            }.runTaskAsynchronously(instance);
-        }
+            }
+        }.runTaskAsynchronously(instance);
     }
 
     private void handleCacheFailure(Player p) {
@@ -225,12 +220,20 @@ public class ProfileCache implements Listener {
         }
     }
 
+    public XProfile getLocalProfileByName(String username) {
+        return getLocalProfile(convertToUniqueId(username));
+    }
+
     public XProfile getLocalProfile(String uniqueId) {
         return accessProfile(cache.get(uniqueId.toLowerCase()));
     }
 
+    public XProfile getLocalProfile(UUID uniqueId) {
+        return getLocalProfile(uniqueId.toString());
+    }
+
     public XProfile getLocalProfile(Player player) {
-        return getLocalProfile(player.getUniqueId().toString());
+        return getLocalProfile(player.getUniqueId());
     }
 
     public XProfile getRedisProfile(String uniqueId) {
@@ -386,6 +389,25 @@ public class ProfileCache implements Listener {
                 cache.remove(key);
             }
         }
+    }
+
+    public void clearCache() {
+        cache.clear();
+    }
+
+    public void reloadCache() {
+        clearCache();
+        Bukkit.getOnlinePlayers().forEach(p -> {
+            XProfile profile = handleCache(p.getName(), p.getUniqueId().toString());
+            initializeProfile(p, profile);
+        });
+
+    }
+
+    public void reloadPlayer(Player p, XProfile profile) {
+        removeFromLocalCache(profile);
+        profile = handleCache(profile.getName(), profile.getUniqueId());
+        initializeProfile(p, profile);
     }
 
 }

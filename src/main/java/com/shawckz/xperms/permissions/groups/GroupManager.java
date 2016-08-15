@@ -2,7 +2,6 @@ package com.shawckz.xperms.permissions.groups;
 
 
 import com.shawckz.xperms.XPerms;
-import com.shawckz.xperms.permissions.PermServer;
 import com.shawckz.xperms.profile.XProfile;
 
 /**
@@ -11,51 +10,55 @@ import com.shawckz.xperms.profile.XProfile;
 public class GroupManager {
 
     private final XPerms instance;
-    private final GroupCache groupSet;
+    private final GroupSet groupSet;
 
     public GroupManager(XPerms instance) {
         this.instance = instance;
-        this.groupSet = new GroupCache(instance);
+        this.groupSet = new GroupSet();
     }
 
     public void loadGroups() {
+        // Clear current groups
+        groupSet.getGroups().clear();
+        // Load new groups
         instance.getDatabaseManager().getDataStore()
                 .createQuery(Group.class)
                 .asList()
-                .forEach(group -> registerGroup(group.getPermServer(), group));
+                .forEach(this::registerGroup);
         XPerms.log("Loaded groups into the cache.");
     }
 
     public void saveGroups() {
         int savedGroups = 0;
-        for (PermServer permServer : groupSet.getGroups().keySet()) {
-            GroupSet xGroupSet = groupSet.getGroupSet(permServer);
-            for (Group group : xGroupSet.getGroups().values()) {
-                instance.getDatabaseManager().getDataStore().save(group);
-                savedGroups++;
-            }
+        for (Group group : groupSet.getGroups().values()) {
+            instance.getDatabaseManager().getDataStore().save(group);
+            savedGroups++;
         }
         XPerms.log("Saved " + savedGroups + " groups to the database.");
     }
 
-    public void registerGroup(PermServer permServer, Group group) {
-        groupSet.saveGroup(permServer, group);
+    public void registerGroup(Group group) {
+        groupSet.saveGroup(group);
     }
 
-    public boolean hasRegisteredGroup(PermServer server, Group group) {
-        return hasRegisteredGroup(server, group.getName());
+    public void unregisterGroup(Group group) {
+        groupSet.removeGroup(group);
     }
 
-    public boolean hasRegisteredGroup(PermServer server, String groupName) {
-        return getGroupSet(server).hasGroup(groupName);
+    public boolean hasRegisteredGroup(Group group) {
+        return hasRegisteredGroup(group.getName());
     }
 
-    public Group getGroup(PermServer server, String groupName) {
-        return getGroupSet(server).getGroup(groupName);
+    public boolean hasRegisteredGroup(String groupName) {
+        return getGroupSet().hasGroup(groupName);
     }
 
-    public GroupSet getGroupSet(PermServer server) {
-        return groupSet.getGroupSet(server);
+    public Group getGroup(String groupName) {
+        return getGroupSet().getGroup(groupName);
+    }
+
+    public GroupSet getGroupSet() {
+        return groupSet;
     }
 
     public void refreshPlayerPermissions() {

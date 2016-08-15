@@ -15,7 +15,7 @@ public class CmdAddGroup implements GCommand {
 
     @GCmd(name = "xperms addgroup", aliases = {"perms addgroup"}, permission = "xperms.addgroup",
             usage = "/xperms addgroup <player> <server> <group>", minArgs = 3)
-    public void onCmdAddGroup(final GCmdArgs args) {
+    public void onCmd(final GCmdArgs args) {
         final CommandSender sender = args.getSender().getCommandSender();
 
         new BukkitRunnable() {
@@ -26,15 +26,19 @@ public class CmdAddGroup implements GCommand {
                     String permServerString = args.getArg(1);
                     if (XPerms.getInstance().getServerCache().hasPermServer(permServerString)) {
                         PermServer permServer = XPerms.getInstance().getServerCache().getPermServer(permServerString);
-                        Group group = XPerms.getInstance().getGroupManager().getGroup(permServer, args.getArg(2));
-                        if (!profile.getGroups().getGroupSet(permServer).hasGroup(group)) {
-                            profile.getGroups().getGroupSet(permServer).saveGroup(group);
-                            profile.refreshPermissions();
-                            profile.saveProfile();
-                            sender.sendMessage(ChatColor.GREEN + "Added group " + group.getName() + " to " + profile.getName()
-                                    + " for server " + permServer.getName() + ".");
+                        Group group = XPerms.getInstance().getGroupManager().getGroup(args.getArg(2));
+                        if (group != null) {
+                            if (!profile.getGroups().getGroupSet(permServer).hasGroup(group)) {
+                                profile.getGroups().getGroupSet(permServer).saveGroup(group);
+                                profile.refreshPermissions();
+                                profile.saveProfile();
+                                sender.sendMessage(ChatColor.GREEN + "Added group " + group.getName() + " to " + profile.getName()
+                                        + " for server " + permServer.getName() + ".");
+                            } else {
+                                sender.sendMessage(ChatColor.RED + "That player already has that group for that server.");
+                            }
                         } else {
-                            sender.sendMessage(ChatColor.RED + "That player already has that group for that server.");
+                            sender.sendMessage(ChatColor.RED + "That group does not exist.");
                         }
                     } else {
                         sender.sendMessage(ChatColor.RED + "Perm Server not found in cache.");

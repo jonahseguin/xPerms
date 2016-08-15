@@ -25,7 +25,4 @@ public class XConfig extends Configuration {
     @ConfigData("profile-cache.failure-handling")
     private boolean cacheFailureHandling = true;
 
-    @ConfigData("profile-cache.remove-on-disconnect")
-    private boolean cacheRemoveOnQuit = false; // Default to false, the cache cleanup will handle it later
-
 }

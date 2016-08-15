@@ -116,6 +116,9 @@ public class DatabaseManager extends Configuration {
         return jedis;
     }
 
+    public JedisPool getJedisPool() {
+        return jedisPool;
+    }
 
     public void returnJedisResource(Jedis jedis) {
         jedis.close();

@@ -29,7 +29,7 @@ public class PermServerCache {
         return servers.containsKey(name.toLowerCase());
     }
 
-    private void loadPermServers() {
+    public void loadPermServers() {
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -52,6 +52,10 @@ public class PermServerCache {
                 }
             }.runTaskAsynchronously(XPerms.getInstance());
         }
+    }
+
+    public Map<String, PermServer> getServers() {
+        return servers;
     }
 
     public PermServer getThisPermServer() {

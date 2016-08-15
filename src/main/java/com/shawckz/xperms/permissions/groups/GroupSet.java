@@ -1,6 +1,5 @@
 package com.shawckz.xperms.permissions.groups;
 
-import com.shawckz.xperms.permissions.PermServer;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -12,7 +11,6 @@ import java.util.Map;
 @Data
 public class GroupSet {
 
-    private final PermServer server;
     private final Map<String, Group> groups = new HashMap<>();
 
     public boolean hasGroup(String groupName) {

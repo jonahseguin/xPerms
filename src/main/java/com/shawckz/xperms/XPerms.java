@@ -1,10 +1,10 @@
 package com.shawckz.xperms;
 
 import com.shawckz.xperms.command.GCommandHandler;
-import com.shawckz.xperms.commands.CmdAddGroup;
-import com.shawckz.xperms.commands.CmdXPerms;
+import com.shawckz.xperms.commands.*;
 import com.shawckz.xperms.config.XConfig;
 import com.shawckz.xperms.database.DatabaseManager;
+import com.shawckz.xperms.network.XNetworkManager;
 import com.shawckz.xperms.permissions.PermServer;
 import com.shawckz.xperms.permissions.PermServerCache;
 import com.shawckz.xperms.permissions.groups.GroupManager;
@@ -21,6 +21,7 @@ public class XPerms extends JavaPlugin {
     private GroupManager groupManager;
     private ProfileCache cache;
     private PermServerCache serverCache;
+    private XNetworkManager networkManager;
 
     @Override
     public void onEnable() {
@@ -28,22 +29,37 @@ public class XPerms extends JavaPlugin {
         this.config = new XConfig(this);
         this.config.load();
         this.config.save();
-        serverCache = new PermServerCache(new PermServer(this.config.getServer()), new PermServer(GLOBAL_SERVER));
+        this.serverCache = new PermServerCache(new PermServer(this.config.getServer()), new PermServer(GLOBAL_SERVER));
         this.databaseManager = new DatabaseManager(this);
         this.groupManager = new GroupManager(this);
         this.groupManager.loadGroups();
         this.cache = new ProfileCache(this);
+        this.networkManager = new XNetworkManager(this);
 
         GCommandHandler cmd = new GCommandHandler(this);
         cmd.registerCommands(new CmdXPerms());
         cmd.registerCommands(new CmdAddGroup());
+        cmd.registerCommands(new CmdAddPermission());
+        cmd.registerCommands(new CmdRemoveGroup());
+        cmd.registerCommands(new CmdCreateGroup());
+        cmd.registerCommands(new CmdDeleteGroup());
+        cmd.registerCommands(new CmdCreateServer());
+        cmd.registerCommands(new CmdRemovePermission());
+        cmd.registerCommands(new CmdListServers());
+        cmd.registerCommands(new CmdListGroups());
+        cmd.registerCommands(new CmdShowGroups());
+        cmd.registerCommands(new CmdAddSubgroup());
+        cmd.registerCommands(new CmdRemoveSubgroup());
+        cmd.registerCommands(new CmdGroupInfo());
+        cmd.registerCommands(new CmdSetSuffix());
+        cmd.registerCommands(new CmdTestPermission());
     }
 
     @Override
     public void onDisable() {
         this.groupManager.saveGroups();
         this.databaseManager.shutdown();
-        instance = null;
+        XPerms.instance = null;
     }
 
     public static void log(String msg) {
@@ -80,5 +96,9 @@ public class XPerms extends JavaPlugin {
 
     public PermServerCache getServerCache() {
         return serverCache;
+    }
+
+    public XNetworkManager getNetworkManager() {
+        return networkManager;
     }
 }
