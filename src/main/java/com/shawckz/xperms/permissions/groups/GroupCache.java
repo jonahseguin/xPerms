@@ -42,7 +42,7 @@ public class GroupCache {
 
     public GroupSet getGroupSet(PermServer permServer) {
         if (!groups.containsKey(permServer)) {
-            groups.put(permServer, new GroupSet(permServer));
+            groups.put(permServer, new GroupSet());
         }
         return groups.get(permServer);
     }

@@ -27,6 +27,7 @@ public class XProfile {
     @Reference
     private ProfileGroupCache groups;
 
+    /* Per-profile permissions assigned to this profile only */
     @Embedded
     private Permissions permissions = new Permissions();
 
@@ -71,14 +72,14 @@ public class XProfile {
         permissionAttachment = new PermissionAttachment(instance, player);
         //Load permissions from GLOBAL
         for (String groupName : groups.getGroupSet(instance.getGlobalPermServer()).getGroups()) {
-            Group g = instance.getGroupManager().getGroup(instance.getGlobalPermServer(), groupName);
+            Group g = instance.getGroupManager().getGroup(groupName);
             for (Permission permission : g.getGroupPermissions().getPermissions().values()) {
                 permissionAttachment.setPermission(permission.getPermission(), permission.isValue());
             }
         }
         //Load permissions from LOCAL, load after loading GLOBAL so that local overrides global
         for (String groupName : groups.getGroupSet(instance.getPermServer()).getGroups()) {
-            Group g = instance.getGroupManager().getGroup(instance.getPermServer(), groupName);
+            Group g = instance.getGroupManager().getGroup(groupName);
             for (Permission permission : g.getGroupPermissions().getPermissions().values()) {
                 permissionAttachment.setPermission(permission.getPermission(), permission.isValue());
             }

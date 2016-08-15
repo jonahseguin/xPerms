@@ -16,7 +16,6 @@ public class CmdXPerms implements GCommand {
         msg(sender, "&7*** &9xPerms &7****");
         msg(sender, "&eDeveloped by Shawckz - https://shawckz.com");
         msg(sender, "&7--> &6Commands");
-
         msg(sender, "&7/xperms createserver <name>"); // Done
         msg(sender, "&7/xperms listservers"); // Done
         msg(sender, "&7/xperms listgroups"); // Done
@@ -33,6 +32,11 @@ public class CmdXPerms implements GCommand {
         msg(sender, "&7/xperms setprefix <group> <prefix>"); // Done
         msg(sender, "&7/xperms setsuffix <group> <suffix>"); // Done
         msg(sender, "&7/xperms testperm <player> <perm>"); // Done
+        msg(sender, "&7/xperms player addperm <player> <perm>"); // TODO
+        msg(sender, "&7/xperms player removeperm <player> <perm>"); // TODO
+        msg(sender, "&7/xperms player lookup <player>"); // TODO
+        msg(sender, "&7/xperms fetch <groups|servers|players>"); // TODO
+        msg(sender, "&7/xperms push <groups|servers|players>"); // TODO
     }
 
     private void msg(CommandSender sender, String msg) {

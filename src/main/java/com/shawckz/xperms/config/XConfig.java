@@ -25,4 +25,10 @@ public class XConfig extends Configuration {
     @ConfigData("profile-cache.failure-handling")
     private boolean cacheFailureHandling = true;
 
+    @ConfigData("chat.placeholder.prefix")
+    private String placeholderPrefix = "{PREFIX}";
+
+    @ConfigData("chat.placeholder.suffix")
+    private String placeholderSuffix = "{SUFFIX}";
+
 }

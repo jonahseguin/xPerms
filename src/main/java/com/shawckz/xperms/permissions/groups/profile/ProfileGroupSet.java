@@ -57,7 +57,7 @@ public class ProfileGroupSet {
 
     public Group getGroup(String groupName) {
         if (groups.contains(groupName)) {
-            return instance.getGroupManager().getGroup(permServer, groupName);
+            return instance.getGroupManager().getGroup(groupName);
         }
         return null;
     }
